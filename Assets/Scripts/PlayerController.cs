@@ -54,7 +54,12 @@ public class PlayerController : MonoBehaviour
     private int stepsXRecoiled;
     private int stepsYRecoiled;
 
-    PlayerStateList pState;
+    [Header("Health Settings:")]
+    public int health;
+    public int maxHealth;
+    [Space(5)]
+
+    [HideInInspector] public PlayerStateList pState;
     private Rigidbody2D rb;
     private float xAxis;
     private float yAxis;
@@ -281,6 +286,26 @@ public class PlayerController : MonoBehaviour
     {
         stepsYRecoiled = 0;
         pState.recoilingY = false;
+    }
+
+    public void TakeDamage(float _damage)
+    {
+        health -= Mathf.RoundToInt(_damage);
+        StartCoroutine(StopTakingDamage());
+    }
+
+    IEnumerator StopTakingDamage()
+    {
+        pState.invincible = true;
+        anim.SetTrigger("TakeDamage");
+        ClampHealth();
+        yield return new WaitForSeconds(1f);
+        pState.invincible = false;
+    }
+
+    void ClampHealth() 
+    {
+        health = Mathf.Clamp(health, 0, maxHealth);
     }
 
     public bool Grounded()
